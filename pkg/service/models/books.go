@@ -286,3 +286,22 @@ func CreateBook(title, summary, isbn string, authorID primitive.ObjectID, genreI
 	bookID = res.InsertedID.(primitive.ObjectID).Hex()
 	return bookID, nil
 }
+
+// DeleteBookByID удаляет данные книги из БД.
+func DeleteBookByID(bookID primitive.ObjectID) error {
+
+	var err error
+
+	libDB := app.ClientDB.Database("local_library")
+	booksCollection := libDB.Collection("books")
+
+	ctx := context.TODO()
+	_, err = booksCollection.DeleteOne(ctx, bson.D{primitive.E{
+		Key: "_id", Value: bookID,
+	}})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

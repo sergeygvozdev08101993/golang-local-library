@@ -1,0 +1,30 @@
+{{define "content"}}
+    <h1>Delete author: {{.Author.Name}}</h1>
+        <p>{{.Author.Years}}</p>
+        {{if not .Books}}
+            <p>Do you really want to delete this Author?</p>
+                <form method="post" action="/catalog/author/{{.Author.ID}}/delete">
+                    <div class="form-group">
+                        <input id="authorId" class="form-control" type="hidden" name="authorId" required value="{{.Author.ID}}" />
+                    </div>
+                    <button class="btn btn-primary" type="submit">
+                        Delete
+                    </button>
+                </form>
+        {{else}}
+            <p>
+                <strong>Delete the following books before attempting to delete this author.</strong>
+            </p>
+            <div style="margin-left: 20px; margin-top: 20px;">
+                <h4>Books</h4>
+                <dl>
+                    {{range .Books}}
+                        <dt>
+                            <a href="/catalog/book/{{.ID}}">{{.Name}}</a>
+                        </dt>
+                        <dd>{{.Summary}}</dd>
+                    {{end}}
+                </dl>
+            </div>
+        {{end}}
+{{end}}

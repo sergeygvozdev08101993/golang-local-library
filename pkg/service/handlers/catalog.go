@@ -21,17 +21,71 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/catalog", http.StatusSeeOther)
 	} else {
 		if urlParts[2] == "book" && len(urlParts[3]) == 24 {
-			GetBook(w, r)
+
+			if len(urlParts) == 5 && urlParts[4] == "delete" {
+
+				if r.Method == "GET" {
+					GetBook(w, r, "/book_delete.gohtml")
+					return
+				} else if r.Method == "POST" {
+					DeleteBook(w, r)
+					return
+				}
+			}
+
+			if len(urlParts) == 5 && urlParts[4] == "update" {
+				/*GetBook(w, r, "/book_delete.gohtml")
+				return*/
+			}
+
+			GetBook(w, r, "/book_detail.gohtml")
 			return
+
 		} else if urlParts[2] == "author" && len(urlParts[3]) == 24 {
-			GetAuthor(w, r)
+
+			if len(urlParts) == 5 && urlParts[4] == "delete" {
+
+				if r.Method == "GET" {
+					GetAuthor(w, r, "/author_delete.gohtml")
+					return
+				} else if r.Method == "POST" {
+					DeleteAuthor(w, r)
+					return
+				}
+			}
+
+			if len(urlParts) == 5 && urlParts[4] == "update" {
+				/*GetAuthor(w, r, "/author_delete.gohtml")
+				return*/
+			}
+
+			GetAuthor(w, r, "/author_detail.gohtml")
 			return
+
 		} else if urlParts[2] == "genre" && len(urlParts[3]) == 24 {
 			GetGenre(w, r)
 			return
 		} else if urlParts[2] == "bookinstance" && len(urlParts[3]) == 24 {
-			GetBookInstance(w, r)
+
+			if len(urlParts) == 5 && urlParts[4] == "delete" {
+
+				if r.Method == "GET" {
+					GetBookInstance(w, r, "/bookinstance_delete.gohtml")
+					return
+				} else if r.Method == "POST" {
+					DeleteBookInstance(w, r)
+					return
+				}
+			}
+
+			if len(urlParts) == 5 && urlParts[4] == "update" {
+				/*GetBookInstance(w, r, "/bookinstance_delete.gohtml")
+				return*/
+			}
+
+			GetBookInstance(w, r, "/bookinstance_detail.gohtml")
 			return
+
 		}
 	}
 }

@@ -167,3 +167,22 @@ func CreateAuthor(firstName, familyName string, birthDate, deathDate interface{}
 	authorID = res.InsertedID.(primitive.ObjectID).Hex()
 	return authorID, nil
 }
+
+// DeleteAuthorByID удаляет данные автора из БД.
+func DeleteAuthorByID(authorID primitive.ObjectID) error {
+
+	var err error
+
+	libDB := app.ClientDB.Database("local_library")
+	authorsCollection := libDB.Collection("authors")
+
+	ctx := context.TODO()
+	_, err = authorsCollection.DeleteOne(ctx, bson.D{primitive.E{
+		Key: "_id", Value: authorID,
+	}})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

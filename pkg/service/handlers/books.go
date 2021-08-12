@@ -11,7 +11,7 @@ import (
 )
 
 // GetBook обрабатывает запрос для отображения информации по конкретной книге.
-func GetBook(w http.ResponseWriter, r *http.Request) {
+func GetBook(w http.ResponseWriter, r *http.Request, contentTemplate string) {
 
 	var (
 		bookID primitive.ObjectID
@@ -47,7 +47,7 @@ func GetBook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl, err := template.ParseFiles(templateDirPath+"/index.gohtml", templateDirPath+"/book_detail.gohtml")
+	tmpl, err := template.ParseFiles(templateDirPath+"/index.gohtml", templateDirPath+contentTemplate)
 	if err != nil {
 		renderError(w, http.StatusInternalServerError, "Internal Server Error")
 		app.ErrLog.Printf("failed to parse template files: %v", err)
@@ -259,4 +259,40 @@ func renderError(w http.ResponseWriter, code int64, body string) {
 		app.ErrLog.Println(err)
 		return
 	}
+}
+
+// DeleteBook обрабатывает POST-запрос из HTML-формы по удалению данных книги,
+// удаляет данные книги из БД и перенаправляет на страницу, содержащую список книг.
+func DeleteBook(w http.ResponseWriter, r *http.Request) {
+
+	var (
+		bookIDStr string
+		bookID    primitive.ObjectID
+
+		err error
+	)
+
+	if err = r.ParseForm(); err != nil {
+		renderError(w, http.StatusInternalServerError, "Internal Server Error")
+		app.ErrLog.Printf("failed to parse book delete form: %v", err)
+		return
+	}
+
+	bookIDStr = r.FormValue("bookId")
+
+	bookID, err = primitive.ObjectIDFromHex(bookIDStr)
+	if err != nil {
+		renderError(w, http.StatusInternalServerError, "Internal Server Error")
+		app.ErrLog.Printf("failed to get book ID: %v", err)
+		return
+	}
+
+	if err = models.DeleteBookByID(bookID); err != nil {
+		renderError(w, http.StatusInternalServerError, "Internal Server Error")
+		app.ErrLog.Printf("failed to delete book by ID: %v", err)
+		return
+	}
+
+	redirectURL := "/catalog/books"
+	http.Redirect(w, r, redirectURL, http.StatusSeeOther)
 }

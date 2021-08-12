@@ -1,0 +1,67 @@
+{{define "content"}}
+    <h1>Delete Book: {{.Book.Name}}</h1>
+    <p><strong>Author: </strong>
+        <a href="/catalog/author/{{.Book.Author.ID}}">
+            {{.Book.Author.Name}}
+        </a>
+    </p>
+    <p>
+        <strong>Summary: </strong>{{.Book.Summary}}
+    </p>
+    <p>
+        <strong>ISBN: </strong>{{.Book.Isbn}}
+    </p>
+    <p>
+        <strong>Genre: </strong>
+        {{range .Book.Genre}}
+            <a href="/catalog/genre/{{.ID}}">{{.Name}}</a>
+        {{end}}
+    </p>
+    <hr />
+    {{if not .BookInstances}}
+        <p>Do you really want to delete this Book?</p>
+        <form method="post" action="/catalog/book/{{.Book.ID}}/delete">
+            <div class="form-group">
+                <input id="bookId" class="form-control" type="hidden" name="bookId" required value="{{.Book.ID}}" />
+            </div>
+            <button class="btn btn-primary" type="submit">
+                Delete
+            </button>
+        </form>
+    {{else}}
+        <p>
+            <strong>Delete the following copies before attempting to delete this Book.</strong>
+        </p>
+            <div style="margin-left: 20px; margin-top: 20px;">
+                <h4>Copies</h4>
+                {{range .BookInstances}}
+                    <hr />
+                    {{if eq .Status "Available"}}
+                        <p class="text-success">
+                            {{.Status}}
+                        </p>
+                    {{else if eq .Status "Maintenance"}}
+                        <p class="text-danger">
+                            {{.Status}}
+                        </p>
+                    {{else}}
+                        <p class="text-warning">
+                            {{.Status}}
+                        </p>
+                    {{end}}
+                    <p>
+                        <strong>Imprint:</strong> {{.Imprint}}
+                    </p>
+                    {{if ne .Status "Available"}}
+                        <p>
+                            <strong>Due Back: </strong>{{.DueBack}}
+                        </p>
+                    {{end}}
+                    <p>
+                        <strong>ID: </strong>
+                        <a href="/catalog/bookinstance/{{.ID}}">{{.ID}}</a>
+                    </p>
+                {{end}}
+            </div>
+    {{end}}
+{{end}}
