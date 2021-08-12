@@ -1,0 +1,25 @@
+{{define "error"}}
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>{{.Message}}</title>
+        <style>
+            html {
+                font-size: 120%;
+                font-family: Verdana, Arial, Helvetica, sans-serif;
+                color: crimson;
+                text-align: center;
+            }
+        </style>
+    </head>
+    <body>
+    <div class="container-fluid">
+        <h1>{{.Status}}</h1>
+        <h2>{{.Message}}</h2>
+        <hr>
+        <a href="/catalog">Back to Home page</a>
+    </div>
+    </body>
+    </html>
+{{end}}

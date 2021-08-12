@@ -1,0 +1,37 @@
+{{define "content"}}
+    <h1>Genre: {{.Genre.Name}}</h1>
+
+    <div style="margin-left: 20px; margin-top: 20px;">
+        <h4>Books</h4>
+
+        {{if not .Books}}
+            <p>
+                This genre has no books.
+            </p>
+        {{else}}
+            <dl>
+                {{range .Books}}
+                    <dt>
+                        <a href="/catalog/book/{{.ID}}">
+                            {{.Name}}
+                        </a>
+                    </dt>
+                    <dd>
+                        {{.Summary}}
+                    </dd>
+                {{end}}
+            </dl>
+        {{end}}
+    </div>
+    <hr />
+    <p>
+        <a href="/catalog/genre/{{.Genre.ID}}/delete">
+            Delete genre
+        </a>
+    </p>
+    <p>
+        <a href="/catalog/genre/{{.Genre.ID}}/update">
+            Update genre
+        </a>
+    </p>
+{{end}}

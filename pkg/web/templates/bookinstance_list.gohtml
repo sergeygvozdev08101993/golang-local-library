@@ -1,0 +1,27 @@
+{{define "content"}}
+    <h1>{{.Title}}</h1>
+        <ul>
+            {{if not .BookInstanceList}}
+                <li>
+                    There are no book copies in this library
+                </li>
+            {{else}}
+                {{range .BookInstanceList}}
+                    <li>
+                        <a href="/catalog/bookinstance/{{.ID}}">{{.BookName}} : {{.Imprint}}</a> -
+                        {{if eq .Status "Available"}}
+                            <span class="text-success">{{.Status}}</span>
+                        {{else if eq .Status "Maintenance"}}
+                            <span class="text-danger">{{.Status}}</span>
+                        {{else}}
+                            <span class="text-warning">{{.Status}}</span>
+                        {{end}}
+
+                        {{if ne .Status "Available"}}
+                            <span>(Due: {{.DueBack}})</span>
+                        {{end}}
+                    </li>
+                {{end}}
+            {{end}}
+        </ul>
+{{end}}

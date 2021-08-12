@@ -1,0 +1,44 @@
+{{define "content"}}
+    <h1>ID: {{.BookInstance.ID}}</h1>
+        <p>
+            <strong>Title: </strong>
+            <a href="/catalog/book/{{.BookInstance.BookID}}">
+                {{.BookInstance.BookName}}
+            </a>
+        </p>
+        <p>
+            <strong>Imprint: </strong>{{.BookInstance.Imprint}}
+        </p>
+        <p>
+            <strong>Status: </strong>
+            {{if eq .BookInstance.Status "Available"}}
+                <span class="text-success">
+                    {{.BookInstance.Status}}
+                </span>
+            {{else if eq .BookInstance.Status "Maintenance"}}
+                <span class="text-danger">
+                {{.BookInstance.Status}}
+                </span>
+            {{else}}
+                <span class="text-warning">
+                    {{.BookInstance.Status}}
+                </span>
+            {{end}}
+        </p>
+        {{if ne .BookInstance.Status "Available"}}
+            <p>
+                <strong>Due Back: </strong> {{.BookInstance.DueBack}}
+            </p>
+        {{end}}
+    <hr />
+    <p>
+        <a href="/catalog/bookinstance/{{.BookInstance.ID}}/delete">
+            Delete BookInstance
+        </a>
+    </p>
+    <p>
+        <a href="/catalog/bookinstance/{{.BookInstance.ID}}/update">
+            Update BookInstance
+        </a>
+    </p>
+{{end}}
