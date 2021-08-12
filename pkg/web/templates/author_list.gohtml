@@ -1,0 +1,14 @@
+{{define "content"}}
+    <h1>{{.Title}}</h1>
+    <ul>
+        {{if not .AuthorList}}
+            <li>There are no authors</li>
+        {{else}}
+            {{range .AuthorList}}
+                <li>
+                    <a href="/catalog/author/{{.ID}}">{{.Name}}</a> ({{.Years}})
+                </li>
+            {{end}}
+        {{end}}
+    </ul>
+{{end}}

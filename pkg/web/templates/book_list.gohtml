@@ -1,0 +1,14 @@
+{{define "content"}}
+    <h1>{{.Title}}</h1>
+        <ul>
+            {{if not .BookList}}
+                <li>There are no books</li>
+            {{else}}
+                {{range .BookList}}
+                    <li>
+                        <a href="/catalog/book/{{.ID}}">{{.Name}}</a> ({{.Author}})
+                    </li>
+                {{end}}
+            {{end}}
+        </ul>
+{{end}}

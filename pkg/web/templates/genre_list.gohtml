@@ -1,0 +1,14 @@
+{{define "content"}}
+    <h1>{{.Title}}</h1>
+    <ul>
+        {{if not .GenreList}}
+            <li>There are no genres</li>
+        {{else}}
+            {{range .GenreList}}
+                <li>
+                    <a href="/catalog/genre/{{.ID}}">{{.Name}}</a>
+                </li>
+            {{end}}
+        {{end}}
+    </ul>
+{{end}}
