@@ -1,0 +1,47 @@
+{{define "content"}}
+    <h1>Delete BookInstance</h1>
+        <p>
+            <strong>Do you really want to delete this BookInstance?</strong>
+        </p>
+        <div style="margin-left: 20px;">
+            <p><strong>ID: </strong>{{.BookInstance.ID}}</p>
+            <p>
+                <strong>Title: </strong>
+                <a href="/catalog/book/{{.BookInstance.BookID}}">
+                    {{.BookInstance.BookName}}
+                </a>
+            </p>
+            <p>
+                <strong>Imprint: </strong>{{.BookInstance.Imprint}}
+            </p>
+            <p>
+                <strong>Status: </strong>
+                {{if eq .BookInstance.Status "Available"}}
+                    <span class="text-success">
+                    {{.BookInstance.Status}}
+                </span>
+                {{else if eq .BookInstance.Status "Maintenance"}}
+                    <span class="text-danger">
+                {{.BookInstance.Status}}
+                </span>
+                {{else}}
+                    <span class="text-warning">
+                    {{.BookInstance.Status}}
+                </span>
+                {{end}}
+            </p>
+            {{if ne .BookInstance.Status "Available"}}
+                <p>
+                    <strong>Due Back: </strong> {{.BookInstance.DueBack}}
+                </p>
+            {{end}}
+        </div>
+    <form method="post" action="/catalog/bookinstance/{{.BookInstance.ID}}/delete">
+        <div class="form-group">
+            <input id="bookinstanceId" class="form-control" type="hidden" name="bookinstanceId" required value="{{.BookInstance.ID}}" />
+        </div>
+        <button class="btn btn-primary" type="submit">
+            Delete
+        </button>
+    </form>
+{{end}}

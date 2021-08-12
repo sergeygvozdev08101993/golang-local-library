@@ -12,7 +12,7 @@ import (
 )
 
 // GetBookInstance обрабатывает запрос для отображения информации по конкретному экземпляру книги.
-func GetBookInstance(w http.ResponseWriter, r *http.Request) {
+func GetBookInstance(w http.ResponseWriter, r *http.Request, contentTemplate string) {
 
 	var (
 		bookInstanceID primitive.ObjectID
@@ -41,7 +41,7 @@ func GetBookInstance(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl, err := template.ParseFiles(templateDirPath+"/index.gohtml", templateDirPath+"/bookinstance_detail.gohtml")
+	tmpl, err := template.ParseFiles(templateDirPath+"/index.gohtml", templateDirPath+contentTemplate)
 	if err != nil {
 		renderError(w, http.StatusInternalServerError, "Internal Server Error")
 		app.ErrLog.Printf("failed to parse template files: %v", err)
@@ -208,5 +208,40 @@ func PostCreateBookInstance(w http.ResponseWriter, r *http.Request) {
 
 	redirectURL := "/catalog/bookinstance/" + bookInstanceID
 	http.Redirect(w, r, redirectURL, http.StatusSeeOther)
+}
 
+// DeleteBookInstance обрабатывает POST-запрос из HTML-формы по удалению данных экземпляра книги,
+// удаляет данные экземпляра книги из БД и перенаправляет на страницу, содержащую список экземпляров книг.
+func DeleteBookInstance(w http.ResponseWriter, r *http.Request) {
+
+	var (
+		bookInstanceIDStr string
+		bookInstanceID    primitive.ObjectID
+
+		err error
+	)
+
+	if err = r.ParseForm(); err != nil {
+		renderError(w, http.StatusInternalServerError, "Internal Server Error")
+		app.ErrLog.Printf("failed to parse book instance delete form: %v", err)
+		return
+	}
+
+	bookInstanceIDStr = r.FormValue("bookinstanceId")
+
+	bookInstanceID, err = primitive.ObjectIDFromHex(bookInstanceIDStr)
+	if err != nil {
+		renderError(w, http.StatusInternalServerError, "Internal Server Error")
+		app.ErrLog.Printf("failed to get book instance ID: %v", err)
+		return
+	}
+
+	if err = models.DeleteBookInstanceByID(bookInstanceID); err != nil {
+		renderError(w, http.StatusInternalServerError, "Internal Server Error")
+		app.ErrLog.Printf("failed to delete book instance by ID: %v", err)
+		return
+	}
+
+	redirectURL := "/catalog/bookinstances"
+	http.Redirect(w, r, redirectURL, http.StatusSeeOther)
 }
