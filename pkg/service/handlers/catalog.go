@@ -21,8 +21,26 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/catalog", http.StatusSeeOther)
 	} else {
 		if urlParts[2] == "book" && len(urlParts[3]) == 24 {
-			GetBook(w, r)
+
+			if len(urlParts) == 5 && urlParts[4] == "delete" {
+
+				if r.Method == "GET" {
+					GetBook(w, r, "/book_delete.gohtml")
+					return
+				} else if r.Method == "POST" {
+					DeleteBook(w, r)
+					return
+				}
+			}
+
+			if len(urlParts) == 5 && urlParts[4] == "update" {
+				/*GetBook(w, r, "/book_delete.gohtml")
+				return*/
+			}
+
+			GetBook(w, r, "/book_detail.gohtml")
 			return
+
 		} else if urlParts[2] == "author" && len(urlParts[3]) == 24 {
 
 			if len(urlParts) == 5 && urlParts[4] == "delete" {
