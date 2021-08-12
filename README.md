@@ -1,0 +1,1 @@
+# golang-local-library
