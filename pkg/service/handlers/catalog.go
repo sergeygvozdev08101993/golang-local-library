@@ -24,8 +24,26 @@ func Index(w http.ResponseWriter, r *http.Request) {
 			GetBook(w, r)
 			return
 		} else if urlParts[2] == "author" && len(urlParts[3]) == 24 {
-			GetAuthor(w, r)
+
+			if len(urlParts) == 5 && urlParts[4] == "delete" {
+
+				if r.Method == "GET" {
+					GetAuthor(w, r, "/author_delete.gohtml")
+					return
+				} else if r.Method == "POST" {
+					DeleteAuthor(w, r)
+					return
+				}
+			}
+
+			if len(urlParts) == 5 && urlParts[4] == "update" {
+				/*GetAuthor(w, r, "/author_delete.gohtml")
+				return*/
+			}
+
+			GetAuthor(w, r, "/author_detail.gohtml")
 			return
+
 		} else if urlParts[2] == "genre" && len(urlParts[3]) == 24 {
 			GetGenre(w, r)
 			return

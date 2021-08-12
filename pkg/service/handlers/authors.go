@@ -12,7 +12,7 @@ import (
 )
 
 // GetAuthor обрабатывает запрос для отображения информации по конкретному автору.
-func GetAuthor(w http.ResponseWriter, r *http.Request) {
+func GetAuthor(w http.ResponseWriter, r *http.Request, contentTemplate string) {
 
 	var (
 		authorID primitive.ObjectID
@@ -48,7 +48,7 @@ func GetAuthor(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl, err := template.ParseFiles(templateDirPath+"/index.gohtml", templateDirPath+"/author_detail.gohtml")
+	tmpl, err := template.ParseFiles(templateDirPath+"/index.gohtml", templateDirPath+contentTemplate)
 	if err != nil {
 		renderError(w, http.StatusInternalServerError, "Internal Server Error")
 		app.ErrLog.Printf("failed to parse template files: %v", err)
@@ -145,7 +145,7 @@ func PostCreateAuthor(w http.ResponseWriter, r *http.Request) {
 
 	if err = r.ParseForm(); err != nil {
 		renderError(w, http.StatusInternalServerError, "Internal Server Error")
-		app.ErrLog.Printf("failed to parse author form: %v", err)
+		app.ErrLog.Printf("failed to parse author create form: %v", err)
 		return
 	}
 
@@ -203,5 +203,41 @@ func PostCreateAuthor(w http.ResponseWriter, r *http.Request) {
 	}
 
 	redirectURL := "/catalog/author/" + authorID
+	http.Redirect(w, r, redirectURL, http.StatusSeeOther)
+}
+
+// DeleteAuthor обрабатывает POST-запрос из HTML-формы по удалению данных автора,
+// удаляет данные автора из БД и перенаправляет на страницу, содержащую список авторов.
+func DeleteAuthor(w http.ResponseWriter, r *http.Request) {
+
+	var (
+		authorIDStr string
+		authorID    primitive.ObjectID
+
+		err error
+	)
+
+	if err = r.ParseForm(); err != nil {
+		renderError(w, http.StatusInternalServerError, "Internal Server Error")
+		app.ErrLog.Printf("failed to parse author delete form: %v", err)
+		return
+	}
+
+	authorIDStr = r.FormValue("authorId")
+
+	authorID, err = primitive.ObjectIDFromHex(authorIDStr)
+	if err != nil {
+		renderError(w, http.StatusInternalServerError, "Internal Server Error")
+		app.ErrLog.Printf("failed to get author ID: %v", err)
+		return
+	}
+
+	if err = models.DeleteAuthorByID(authorID); err != nil {
+		renderError(w, http.StatusInternalServerError, "Internal Server Error")
+		app.ErrLog.Printf("failed to delete author by ID: %v", err)
+		return
+	}
+
+	redirectURL := "/catalog/authors"
 	http.Redirect(w, r, redirectURL, http.StatusSeeOther)
 }
