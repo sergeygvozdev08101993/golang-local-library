@@ -11,7 +11,7 @@ import (
 )
 
 // GetGenre обрабатывает запрос для отображения информации по конкретному жанру.
-func GetGenre(w http.ResponseWriter, r *http.Request) {
+func GetGenre(w http.ResponseWriter, r *http.Request, contentTemplate string) {
 
 	var (
 		genreID primitive.ObjectID
@@ -47,7 +47,7 @@ func GetGenre(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl, err := template.ParseFiles(templateDirPath+"/index.gohtml", templateDirPath+"/genre_detail.gohtml")
+	tmpl, err := template.ParseFiles(templateDirPath+"/index.gohtml", templateDirPath+contentTemplate)
 	if err != nil {
 		renderError(w, http.StatusInternalServerError, "Internal Server Error")
 		app.ErrLog.Printf("failed to parse template files: %v", err)
@@ -165,5 +165,41 @@ func PostCreateGenre(w http.ResponseWriter, r *http.Request) {
 	}
 
 	redirectURL := "/catalog/genre/" + genreID
+	http.Redirect(w, r, redirectURL, http.StatusSeeOther)
+}
+
+// DeleteGenre обрабатывает POST-запрос из HTML-формы по удалению жанра,
+// удаляет жанр из БД и перенаправляет на страницу, содержащую список жанров.
+func DeleteGenre(w http.ResponseWriter, r *http.Request) {
+
+	var (
+		genreIDStr string
+		genreID    primitive.ObjectID
+
+		err error
+	)
+
+	if err = r.ParseForm(); err != nil {
+		renderError(w, http.StatusInternalServerError, "Internal Server Error")
+		app.ErrLog.Printf("failed to parse genre delete form: %v", err)
+		return
+	}
+
+	genreIDStr = r.FormValue("genreId")
+
+	genreID, err = primitive.ObjectIDFromHex(genreIDStr)
+	if err != nil {
+		renderError(w, http.StatusInternalServerError, "Internal Server Error")
+		app.ErrLog.Printf("failed to get genre ID: %v", err)
+		return
+	}
+
+	if err = models.DeleteGenreByID(genreID); err != nil {
+		renderError(w, http.StatusInternalServerError, "Internal Server Error")
+		app.ErrLog.Printf("failed to delete genre by ID: %v", err)
+		return
+	}
+
+	redirectURL := "/catalog/genres"
 	http.Redirect(w, r, redirectURL, http.StatusSeeOther)
 }

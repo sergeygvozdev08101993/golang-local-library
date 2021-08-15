@@ -123,3 +123,22 @@ func CreateGenre(name string) (string, error) {
 	genreID = res.InsertedID.(primitive.ObjectID).Hex()
 	return genreID, nil
 }
+
+// DeleteGenreByID удаляет жанр из БД.
+func DeleteGenreByID(genreID primitive.ObjectID) error {
+
+	var err error
+
+	libDB := app.ClientDB.Database("local_library")
+	genresCollection := libDB.Collection("genres")
+
+	ctx := context.TODO()
+	_, err = genresCollection.DeleteOne(ctx, bson.D{primitive.E{
+		Key: "_id", Value: genreID,
+	}})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
