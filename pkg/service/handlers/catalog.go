@@ -63,8 +63,26 @@ func Index(w http.ResponseWriter, r *http.Request) {
 			return
 
 		} else if urlParts[2] == "genre" && len(urlParts[3]) == 24 {
-			GetGenre(w, r)
+
+			if len(urlParts) == 5 && urlParts[4] == "delete" {
+
+				if r.Method == "GET" {
+					GetGenre(w, r, "/genre_delete.gohtml")
+					return
+				} else if r.Method == "POST" {
+					DeleteGenre(w, r)
+					return
+				}
+			}
+
+			if len(urlParts) == 5 && urlParts[4] == "update" {
+				/*GetGenre(w, r, "/genre_delete.gohtml")
+				return*/
+			}
+
+			GetGenre(w, r, "/genre_detail.gohtml")
 			return
+
 		} else if urlParts[2] == "bookinstance" && len(urlParts[3]) == 24 {
 
 			if len(urlParts) == 5 && urlParts[4] == "delete" {
