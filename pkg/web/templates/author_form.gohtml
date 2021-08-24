@@ -1,6 +1,6 @@
 {{define "content"}}
     <h1>{{.Title}}</h1>
-        <form method="post" action="/catalog/author/create">
+        <form method="post" action="{{if eq .Title "Update Author"}}/catalog/author/{{.Author.ID}}/update{{else}}/catalog/author/create{{end}}">
             <div class="form-group">
                 <label for="first_name">First Name: </label>
                 <input
@@ -9,6 +9,7 @@
                         type="text"
                         placeholder="Enter first name ..."
                         name="first_name"
+                        value="{{if eq .Title "Update Author"}}{{.Author.FirstName}}{{else}}{{end}}"
                         required />
                 <label for="family_name">Family Name: </label>
                 <input
@@ -17,6 +18,7 @@
                         type="text"
                         placeholder="Enter family name ..."
                         name="family_name"
+                        value="{{if eq .Title "Update Author"}}{{.Author.FamilyName}}{{else}}{{end}}"
                         required />
             </div>
             <div class="form-group">
@@ -25,7 +27,8 @@
                         id="date_of_birth"
                         class="form-control"
                         type="date"
-                        name="date_of_birth" />
+                        name="date_of_birth"
+                        value="{{if eq .Title "Update Author"}}{{.Author.DateBirth}}{{else}}{{end}}" />
             </div>
             <div class="form-group">
                 <label for="date_of_death">Date of death: </label>
@@ -33,7 +36,8 @@
                         id="date_of_death"
                         class="form-control"
                         type="date"
-                        name="date_of_death" />
+                        name="date_of_death"
+                        value="{{if eq .Title "Update Author"}}{{.Author.DateDeath}}{{else}}{{end}}" />
             </div>
             <button class="btn btn-primary" type="submit">
                 Submit

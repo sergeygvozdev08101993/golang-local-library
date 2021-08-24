@@ -20,7 +20,7 @@ type Detail struct {
 	Books         []BookData
 	BookInstance  BookInstanceData
 	BookInstances []BookInstanceData
-	Author        AuthorData
+	Author        interface{}
 	Genre         GenreData
 }
 

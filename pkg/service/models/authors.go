@@ -12,6 +12,15 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+// AuthorDataNew
+type AuthorDataNew struct {
+	ID         string
+	FirstName  string
+	FamilyName string
+	DateBirth  string
+	DateDeath  string
+}
+
 // GetAuthorByID получает данные автора по его ID.
 func GetAuthorByID(authorID primitive.ObjectID) (AuthorData, error) {
 
@@ -40,6 +49,49 @@ func GetAuthorByID(authorID primitive.ObjectID) (AuthorData, error) {
 		ID:    tmpAuthor["_id"].(primitive.ObjectID).Hex(),
 		Name:  tmpAuthor["family_name"].(string) + ", " + tmpAuthor["first_name"].(string),
 		Years: dateBirth + " - " + dateDeath,
+	}
+
+	return author, nil
+}
+
+// GetAuthorDataByID
+func GetAuthorDataByID(authorID primitive.ObjectID) (AuthorDataNew, error) {
+
+	var (
+		tmpAuthor            bson.M
+		dateBirth, dateDeath string
+		err                  error
+	)
+
+	libDB := app.ClientDB.Database("local_library")
+	authorsCollection := libDB.Collection("authors")
+
+	err = authorsCollection.FindOne(context.TODO(), bson.D{primitive.E{Key: "_id", Value: authorID}}).Decode(&tmpAuthor)
+	if err != nil {
+		return AuthorDataNew{}, err
+	}
+	if err == mongo.ErrNoDocuments {
+		return AuthorDataNew{}, err
+	}
+
+	if tmpAuthor["date_of_birth"] == nil {
+		dateBirth = ""
+	} else {
+		dateBirth = tmpAuthor["date_of_birth"].(primitive.DateTime).Time().Format("2006-01-02")
+	}
+
+	if tmpAuthor["date_of_death"] == nil {
+		dateDeath = ""
+	} else {
+		dateDeath = tmpAuthor["date_of_death"].(primitive.DateTime).Time().Format("2006-01-02")
+	}
+
+	author := AuthorDataNew{
+		ID:         tmpAuthor["_id"].(primitive.ObjectID).Hex(),
+		FirstName:  tmpAuthor["first_name"].(string),
+		FamilyName: tmpAuthor["family_name"].(string),
+		DateBirth:  dateBirth,
+		DateDeath:  dateDeath,
 	}
 
 	return author, nil
@@ -85,11 +137,11 @@ func GetListAllAuthors() ([]AuthorData, error) {
 			dateBirth = getDateStr(author[3].Value)
 		}
 
-		if len(author) == 6 && author[4].Key == "date_of_birth" {
+		if (len(author) == 5 || len(author) == 6) && author[4].Key == "date_of_birth" {
 			dateBirth = getDateStr(author[4].Value)
 		}
 
-		if len(author) == 6 && author[4].Key == "date_of_death" {
+		if (len(author) == 5 || len(author) == 6) && author[4].Key == "date_of_death" {
 			dateDeath = getDateStr(author[4].Value)
 		}
 
@@ -180,6 +232,31 @@ func DeleteAuthorByID(authorID primitive.ObjectID) error {
 	_, err = authorsCollection.DeleteOne(ctx, bson.D{primitive.E{
 		Key: "_id", Value: authorID,
 	}})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// UpdateAuthorByID обновляет данные автора в БД.
+func UpdateAuthorByID(authorID primitive.ObjectID, firstName, familyName string, birthDate, deathDate interface{}) error {
+
+	var err error
+
+	libDB := app.ClientDB.Database("local_library")
+	authorsCollection := libDB.Collection("authors")
+
+	ctx := context.TODO()
+	_, err = authorsCollection.UpdateOne(
+		ctx,
+		bson.M{"_id": authorID},
+		bson.D{
+			{Key: "$set", Value: bson.D{primitive.E{Key: "first_name", Value: firstName}}},
+			{Key: "$set", Value: bson.D{primitive.E{Key: "family_name", Value: familyName}}},
+			{Key: "$set", Value: bson.D{primitive.E{Key: "date_of_birth", Value: birthDate}}},
+			{Key: "$set", Value: bson.D{primitive.E{Key: "date_of_death", Value: deathDate}}},
+		})
 	if err != nil {
 		return err
 	}
