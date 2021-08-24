@@ -137,11 +137,11 @@ func GetListAllAuthors() ([]AuthorData, error) {
 			dateBirth = getDateStr(author[3].Value)
 		}
 
-		if len(author) == 6 && author[4].Key == "date_of_birth" {
+		if (len(author) == 5 || len(author) == 6) && author[4].Key == "date_of_birth" {
 			dateBirth = getDateStr(author[4].Value)
 		}
 
-		if len(author) == 6 && author[4].Key == "date_of_death" {
+		if (len(author) == 5 || len(author) == 6) && author[4].Key == "date_of_death" {
 			dateDeath = getDateStr(author[4].Value)
 		}
 
