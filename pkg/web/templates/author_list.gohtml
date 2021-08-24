@@ -6,7 +6,7 @@
         {{else}}
             {{range .AuthorList}}
                 <li>
-                    <a href="/catalog/author/{{.ID}}">{{.Name}}</a> ({{.Years}})
+                    <a href="/catalog/author/{{.ID}}">{{.FamilyName}}, {{.FirstName}}</a> ({{.DateBirth}} - {{.DateDeath}})
                 </li>
             {{end}}
         {{end}}

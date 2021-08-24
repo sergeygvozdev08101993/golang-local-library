@@ -55,8 +55,28 @@ func GetAuthor(w http.ResponseWriter, r *http.Request, contentTemplate string) {
 		return
 	}
 
+	if len(author.DateBirth) != 0 {
+		dateBirthTmp, err := time.Parse("2006-01-02", author.DateBirth)
+		if err != nil {
+			renderError(w, http.StatusInternalServerError, "Internal Server Error")
+			app.ErrLog.Printf("failed to parse the author date of birth: %v", err)
+			return
+		}
+		author.DateBirth = dateBirthTmp.Format("2 Jan, 2006")
+	}
+
+	if len(author.DateDeath) != 0 {
+		dateDeathTmp, err := time.Parse("2006-01-02", author.DateDeath)
+		if err != nil {
+			renderError(w, http.StatusInternalServerError, "Internal Server Error")
+			app.ErrLog.Printf("failed to parse the author date of death: %v", err)
+			return
+		}
+		author.DateDeath = dateDeathTmp.Format("2 Jan, 2006")
+	}
+
 	d := models.Detail{
-		Title:  author.Name,
+		Title:  author.FamilyName + ", " + author.FirstName,
 		Author: author,
 		Books:  books,
 	}
@@ -274,7 +294,7 @@ func GetUpdateAuthor(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	author, err := models.GetAuthorDataByID(authorID)
+	author, err := models.GetAuthorByID(authorID)
 	if err != nil && err.Error() == "mongo: no documents in result" {
 		renderError(w, http.StatusNotFound, "Not Found")
 		app.ErrLog.Printf("failed to get author by ID from database: %v", err)

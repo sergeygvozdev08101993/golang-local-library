@@ -20,7 +20,7 @@
                         required>
                     <option selected disabled>Select author</option>
                     {{range .AuthorList}}
-                        <option value="{{.ID}}">{{.Name}}</option>
+                        <option value="{{.ID}}">{{.FamilyName}}, {{.FirstName}}</option>
                     {{end}}
                 </select>
             </div>
