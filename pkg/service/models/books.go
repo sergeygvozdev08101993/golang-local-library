@@ -92,8 +92,9 @@ func getResultBook(tmpBook bson.D, bookID primitive.ObjectID, author AuthorData,
 		ID:   bookID.Hex(),
 		Name: tmpBook[2].Value.(string),
 		Author: AuthorData{
-			ID:   author.ID,
-			Name: author.Name,
+			ID:         author.ID,
+			FirstName:  author.FirstName,
+			FamilyName: author.FamilyName,
 		},
 		Summary: summary,
 		Isbn:    tmpBook[5].Value.(string),
@@ -222,9 +223,12 @@ func GetListAllBooks() ([]BookData, error) {
 			if authorIDFromBooksCollection == authorIDFromAuthorsCollection {
 
 				books = append(books, BookData{
-					ID:     id,
-					Name:   name,
-					Author: author.Name,
+					ID:   id,
+					Name: name,
+					Author: AuthorData{
+						FirstName:  author.FirstName,
+						FamilyName: author.FamilyName,
+					},
 				})
 
 				break

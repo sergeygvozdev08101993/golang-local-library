@@ -1,6 +1,6 @@
 {{define "content"}}
-    <h1>Delete author: {{.Author.Name}}</h1>
-        <p>{{.Author.Years}}</p>
+    <h1>Delete author: {{.Author.FamilyName}}, {{.Author.FirstName}}</h1>
+        <p>{{.Author.DateBirth}} - {{.Author.DateDeath}}</p>
         {{if not .Books}}
             <p>Do you really want to delete this Author?</p>
                 <form method="post" action="/catalog/author/{{.Author.ID}}/delete">

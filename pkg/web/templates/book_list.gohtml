@@ -6,7 +6,7 @@
             {{else}}
                 {{range .BookList}}
                     <li>
-                        <a href="/catalog/book/{{.ID}}">{{.Name}}</a> ({{.Author}})
+                        <a href="/catalog/book/{{.ID}}">{{.Name}}</a> ({{.Author.FamilyName}}, {{.Author.FirstName}})
                     </li>
                 {{end}}
             {{end}}

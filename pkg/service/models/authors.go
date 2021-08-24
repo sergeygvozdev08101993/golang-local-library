@@ -12,21 +12,13 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// AuthorDataNew
-type AuthorDataNew struct {
-	ID         string
-	FirstName  string
-	FamilyName string
-	DateBirth  string
-	DateDeath  string
-}
-
 // GetAuthorByID получает данные автора по его ID.
 func GetAuthorByID(authorID primitive.ObjectID) (AuthorData, error) {
 
 	var (
-		tmpAuthor bson.M
-		author    AuthorData
+		tmpAuthor            bson.M
+		author               AuthorData
+		dateBirth, dateDeath string
 
 		err error
 	)
@@ -42,38 +34,6 @@ func GetAuthorByID(authorID primitive.ObjectID) (AuthorData, error) {
 		return author, err
 	}
 
-	dateBirth := getDateStr(tmpAuthor["date_of_birth"])
-	dateDeath := getDateStr(tmpAuthor["date_of_death"])
-
-	author = AuthorData{
-		ID:    tmpAuthor["_id"].(primitive.ObjectID).Hex(),
-		Name:  tmpAuthor["family_name"].(string) + ", " + tmpAuthor["first_name"].(string),
-		Years: dateBirth + " - " + dateDeath,
-	}
-
-	return author, nil
-}
-
-// GetAuthorDataByID
-func GetAuthorDataByID(authorID primitive.ObjectID) (AuthorDataNew, error) {
-
-	var (
-		tmpAuthor            bson.M
-		dateBirth, dateDeath string
-		err                  error
-	)
-
-	libDB := app.ClientDB.Database("local_library")
-	authorsCollection := libDB.Collection("authors")
-
-	err = authorsCollection.FindOne(context.TODO(), bson.D{primitive.E{Key: "_id", Value: authorID}}).Decode(&tmpAuthor)
-	if err != nil {
-		return AuthorDataNew{}, err
-	}
-	if err == mongo.ErrNoDocuments {
-		return AuthorDataNew{}, err
-	}
-
 	if tmpAuthor["date_of_birth"] == nil {
 		dateBirth = ""
 	} else {
@@ -86,7 +46,7 @@ func GetAuthorDataByID(authorID primitive.ObjectID) (AuthorDataNew, error) {
 		dateDeath = tmpAuthor["date_of_death"].(primitive.DateTime).Time().Format("2006-01-02")
 	}
 
-	author := AuthorDataNew{
+	author = AuthorData{
 		ID:         tmpAuthor["_id"].(primitive.ObjectID).Hex(),
 		FirstName:  tmpAuthor["first_name"].(string),
 		FamilyName: tmpAuthor["family_name"].(string),
@@ -146,11 +106,12 @@ func GetListAllAuthors() ([]AuthorData, error) {
 		}
 
 		authorList = append(authorList, AuthorData{
-			ID:    id.Value.(primitive.ObjectID).Hex(),
-			Name:  familyName.Value.(string) + ", " + firstName.Value.(string),
-			Years: dateBirth + " - " + dateDeath,
+			ID:         id.Value.(primitive.ObjectID).Hex(),
+			FirstName:  firstName.Value.(string),
+			FamilyName: familyName.Value.(string),
+			DateBirth:  dateBirth,
+			DateDeath:  dateDeath,
 		})
-
 	}
 
 	return authorList, nil

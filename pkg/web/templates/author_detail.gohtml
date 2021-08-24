@@ -1,6 +1,6 @@
 {{define "content"}}
-    <h1>Author: {{.Author.Name}}</h1>
-        <p>{{.Author.Years}}</p>
+    <h1>Author: {{.Author.FamilyName}}, {{.Author.FirstName}}</h1>
+        <p>{{.Author.DateBirth}} - {{.Author.DateDeath}}</p>
         <div style="margin-left: 20px; margin-top: 20px;">
             <h4>Books</h4>
             <dl>

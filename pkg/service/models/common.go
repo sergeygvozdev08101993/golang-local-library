@@ -39,9 +39,11 @@ type Err struct {
 
 // AuthorData описывает структуру данных коллекции authors.
 type AuthorData struct {
-	ID    string
-	Name  string
-	Years string
+	ID         string
+	FirstName  string
+	FamilyName string
+	DateBirth  string
+	DateDeath  string
 }
 
 // BookData описывает структуру данных коллекции books.
