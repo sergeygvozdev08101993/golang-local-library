@@ -55,8 +55,8 @@ func Index(w http.ResponseWriter, r *http.Request) {
 			}
 
 			if len(urlParts) == 5 && urlParts[4] == "update" {
-				/*GetAuthor(w, r, "/author_delete.gohtml")
-				return*/
+				UpdateAuthor(w, r)
+				return
 			}
 
 			GetAuthor(w, r, "/author_detail.gohtml")
