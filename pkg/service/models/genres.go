@@ -142,3 +142,25 @@ func DeleteGenreByID(genreID primitive.ObjectID) error {
 
 	return nil
 }
+
+// UpdateGenreByID обновляет наименование жанра в БД.
+func UpdateGenreByID(genreID primitive.ObjectID, name string) error {
+
+	var err error
+
+	libDB := app.ClientDB.Database("local_library")
+	genresCollection := libDB.Collection("genres")
+
+	ctx := context.TODO()
+	_, err = genresCollection.UpdateOne(
+		ctx,
+		bson.M{"_id": genreID},
+		bson.D{
+			{Key: "$set", Value: bson.D{primitive.E{Key: "name", Value: name}}},
+		})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

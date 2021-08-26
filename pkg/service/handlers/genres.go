@@ -203,3 +203,114 @@ func DeleteGenre(w http.ResponseWriter, r *http.Request) {
 	redirectURL := "/catalog/genres"
 	http.Redirect(w, r, redirectURL, http.StatusSeeOther)
 }
+
+// UpdateGenre обрабатывает GET-запрос для отображения формы по обновлению данных жанра,
+// а также POST-запрос для обновления полученных данных в БД.
+func UpdateGenre(w http.ResponseWriter, r *http.Request) {
+
+	switch r.Method {
+	case "GET":
+		GetUpdateGenre(w, r)
+		break
+	case "POST":
+		PostUpdateGenre(w, r)
+		break
+	}
+}
+
+// GetUpdateGenre обрабатывает GET-запрос для отображения формы по обновлению данных жанра.
+func GetUpdateGenre(w http.ResponseWriter, r *http.Request) {
+
+	var (
+		genreID primitive.ObjectID
+		err     error
+	)
+
+	urlPath := r.URL.Path
+	urlParts := strings.Split(urlPath, "/")
+
+	genreID, err = primitive.ObjectIDFromHex(urlParts[3])
+	if err != nil {
+		renderError(w, http.StatusInternalServerError, "Internal Server Error")
+		app.ErrLog.Printf("failed to get genre ID: %v", err)
+		return
+	}
+
+	genre, err := models.GetGenreByID(genreID)
+	if err != nil && err.Error() == "mongo: no documents in result" {
+		renderError(w, http.StatusNotFound, "Not Found")
+		app.ErrLog.Printf("failed to get genre by ID from database: %v", err)
+		return
+	}
+	if err != nil {
+		renderError(w, http.StatusInternalServerError, "Internal Server Error")
+		app.ErrLog.Printf("failed to get genre by ID from database: %v", err)
+		return
+	}
+
+	tmpl, err := template.ParseFiles(templateDirPath+"/index.gohtml", templateDirPath+"/genre_form.gohtml")
+	if err != nil {
+		renderError(w, http.StatusInternalServerError, "Internal Server Error")
+		app.ErrLog.Printf("failed to parse template files: %v", err)
+		return
+	}
+
+	d := models.Detail{
+		Title: "Update Genre",
+		Genre: genre,
+	}
+	if err = tmpl.ExecuteTemplate(w, "index", d); err != nil {
+		renderError(w, http.StatusInternalServerError, "Internal Server Error")
+		app.ErrLog.Printf("failed to render template file: %v", err)
+		return
+	}
+}
+
+// PostUpdateGenre обрабатывает POST-запрос из HTML-формы по обновлению данных жанра,
+// обновляет данные в БД и перенаправляет на страницу жанра.
+func PostUpdateGenre(w http.ResponseWriter, r *http.Request) {
+
+	var (
+		name       string
+		genreIDStr string
+		genreID    primitive.ObjectID
+
+		err error
+	)
+
+	urlPath := r.URL.Path
+	urlParts := strings.Split(urlPath, "/")
+	genreIDStr = urlParts[3]
+
+	genreID, err = primitive.ObjectIDFromHex(genreIDStr)
+	if err != nil {
+		renderError(w, http.StatusInternalServerError, "Internal Server Error")
+		app.ErrLog.Printf("failed to get genre ID: %v", err)
+		return
+	}
+
+	if err = r.ParseForm(); err != nil {
+		renderError(w, http.StatusInternalServerError, "Internal Server Error")
+		app.ErrLog.Printf("failed to parse genre create form: %v", err)
+		return
+	}
+
+	name = r.FormValue("name")
+
+	name = strings.TrimSpace(name)
+	if len(name) == 0 {
+		renderError(w, http.StatusBadRequest, "Bad Request")
+		app.ErrLog.Println("failed to get genre name parameter")
+		return
+	}
+
+	err = models.UpdateGenreByID(genreID, name)
+	if err != nil {
+		renderError(w, http.StatusInternalServerError, "Internal Server Error")
+		app.ErrLog.Printf("failed to update genre: %v", err)
+		return
+	}
+
+	redirectURL := "/catalog/genre/" + genreIDStr
+	http.Redirect(w, r, redirectURL, http.StatusSeeOther)
+}
