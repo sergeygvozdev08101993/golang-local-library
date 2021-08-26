@@ -76,8 +76,8 @@ func Index(w http.ResponseWriter, r *http.Request) {
 			}
 
 			if len(urlParts) == 5 && urlParts[4] == "update" {
-				/*GetGenre(w, r, "/genre_delete.gohtml")
-				return*/
+				UpdateGenre(w, r)
+				return
 			}
 
 			GetGenre(w, r, "/genre_detail.gohtml")

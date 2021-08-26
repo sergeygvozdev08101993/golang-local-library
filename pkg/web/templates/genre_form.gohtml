@@ -1,6 +1,6 @@
 {{define "content"}}
     <h1>{{.Title}}</h1>
-        <form method="post" action="/catalog/genre/create">
+        <form method="post" action="{{if eq .Title "Update Genre"}}/catalog/genre/{{.Genre.ID}}/update{{else}}/catalog/genre/create{{end}}">
             <div class="form-group">
                 <label for="name">Genre: </label>
                 <input
@@ -9,6 +9,7 @@
                         type="text"
                         placeholder="Enter a genre name..."
                         name="name"
+                        value="{{if eq .Title "Update Genre"}}{{.Genre.Name}}{{else}}{{end}}"
                         required />
             </div>
             <button class="btn btn-primary" type="submit">
