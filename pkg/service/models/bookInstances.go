@@ -258,3 +258,27 @@ func DeleteBookInstanceByID(bookInstanceID primitive.ObjectID) error {
 
 	return nil
 }
+
+// UpdateBookInstanceByID обновляет данные экземпляра книги в БД.
+func UpdateBookInstanceByID(bookInstanceID primitive.ObjectID, status, imprint string, dueBack interface{}, bookID primitive.ObjectID) error {
+	var err error
+
+	libDB := app.ClientDB.Database("local_library")
+	bookinstancesCollection := libDB.Collection("bookinstances")
+
+	ctx := context.TODO()
+	_, err = bookinstancesCollection.UpdateOne(
+		ctx,
+		bson.M{"_id": bookInstanceID},
+		bson.D{
+			{Key: "$set", Value: bson.D{primitive.E{Key: "status", Value: status}}},
+			{Key: "$set", Value: bson.D{primitive.E{Key: "book", Value: bookID}}},
+			{Key: "$set", Value: bson.D{primitive.E{Key: "imprint", Value: imprint}}},
+			{Key: "$set", Value: bson.D{primitive.E{Key: "due_back", Value: dueBack}}},
+		})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

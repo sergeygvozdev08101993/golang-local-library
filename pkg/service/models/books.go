@@ -309,3 +309,29 @@ func DeleteBookByID(bookID primitive.ObjectID) error {
 
 	return nil
 }
+
+// UpdateBookByID обновляет данные книги в БД.
+func UpdateBookByID(bookID primitive.ObjectID, title, summary, isbn string, authorID primitive.ObjectID, genresID []primitive.ObjectID) error {
+
+	var err error
+
+	libDB := app.ClientDB.Database("local_library")
+	booksCollection := libDB.Collection("books")
+
+	ctx := context.TODO()
+	_, err = booksCollection.UpdateOne(
+		ctx,
+		bson.M{"_id": bookID},
+		bson.D{
+			{Key: "$set", Value: bson.D{primitive.E{Key: "genre", Value: genresID}}},
+			{Key: "$set", Value: bson.D{primitive.E{Key: "title", Value: title}}},
+			{Key: "$set", Value: bson.D{primitive.E{Key: "author", Value: authorID}}},
+			{Key: "$set", Value: bson.D{primitive.E{Key: "summary", Value: summary}}},
+			{Key: "$set", Value: bson.D{primitive.E{Key: "isbn", Value: isbn}}},
+		})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

@@ -21,7 +21,7 @@ type Detail struct {
 	BookInstance  BookInstanceData
 	BookInstances []BookInstanceData
 	Author        interface{}
-	Genre         GenreData
+	Genre         interface{}
 }
 
 // Total описывает структуру данных, предназначенной для

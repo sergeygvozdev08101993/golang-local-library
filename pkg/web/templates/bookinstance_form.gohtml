@@ -1,6 +1,6 @@
 {{define "content"}}
     <h1>{{.Title}}</h1>
-        <form method="post" action="/catalog/bookinstance/create">
+        <form method="post" action="{{if eq .Title "Update BookInstance"}}/catalog/bookinstance/{{.BookInstance.ID}}/create{{else}}/catalog/bookinstance/create{{end}}">
             <div class="form-group">
                 <label for="book">Book: </label>
                 <select
@@ -8,9 +8,17 @@
                         class="form-control"
                         name="book"
                         required>
-                    <option selected disabled>Select a book</option>
-                    {{range .BookList}}
-                        <option value="{{.ID}}">{{.Name}}</option>
+                    {{if eq .Title "Update BookInstance"}}
+                        <option selected disabled value="{{.BookInstance.BookID}}">Primary book: {{.BookInstance.BookName}}</option>
+                        <option selected value="{{.BookInstance.BookID}}">{{.BookInstance.BookName}}</option>
+                        {{range .Books}}
+                            <option value="{{.ID}}">{{.Name}}</option>
+                        {{end}}
+                    {{else}}
+                        <option selected disabled>Select book</option>
+                        {{range .BookList}}
+                            <option value="{{.ID}}">{{.Name}}</option>
+                        {{end}}
                     {{end}}
                 </select>
             </div>
@@ -22,6 +30,7 @@
                         type="text"
                         placeholder="Enter a publisher and date information..."
                         name="imprint"
+                        value="{{if eq .Title "Update BookInstance"}}{{.BookInstance.Imprint}}{{end}}"
                         required />
             </div>
             <div class="form-group">
@@ -30,7 +39,8 @@
                         id="due_back"
                         class="form-control"
                         type="date"
-                        name="due_back" />
+                        name="due_back"
+                        value="{{if eq .Title "Update BookInstance"}}{{.BookInstance.DueBack}}{{end}}" />
             </div>
             <div class="form-group">
                 <label for="status">Status: </label>
@@ -39,11 +49,39 @@
                         class="form-control"
                         name="status"
                         required>
-                    <option selected disabled>Select a status</option>
-                    <option value="Maintenance">Maintenance</option>
-                    <option value="Available">Available</option>
-                    <option value="Loaned">Loaned</option>
-                    <option value="Reserved">Reserved</option>
+                    {{if eq .Title "Update BookInstance"}}
+                        <option disabled>Select a status</option>
+                        {{if eq .BookInstance.Status "Maintenace"}}
+                            <option selected value="Maintenance">Maintenance</option>
+                        {{else}}
+                            <option value="Maintenance">Maintenance</option>
+                        {{end}}
+
+                        {{if eq .BookInstance.Status "Available"}}
+                            <option selected value="Available">Available</option>
+                        {{else}}
+                            <option value="Available">Available</option>
+                        {{end}}
+
+                        {{if eq .BookInstance.Status "Loaned"}}
+                            <option selected value="Loaned">Loaned</option>
+                        {{else}}
+                            <option value="Loaned">Loaned</option>
+                        {{end}}
+
+                        {{if eq .BookInstance.Status "Reserved"}}
+                            <option selected value="Reserved">Reserved</option>
+                        {{else}}
+                            <option value="Reserved">Reserved</option>
+                        {{end}}
+
+                    {{else}}
+                        <option selected disabled>Select a status</option>
+                        <option value="Maintenance">Maintenance</option>
+                        <option value="Available">Available</option>
+                        <option value="Loaned">Loaned</option>
+                        <option value="Reserved">Reserved</option>
+                    {{end}}
                 </select>
             </div>
             <button class="btn btn-primary" type="submit">
