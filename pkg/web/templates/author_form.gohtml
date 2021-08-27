@@ -9,7 +9,7 @@
                         type="text"
                         placeholder="Enter first name ..."
                         name="first_name"
-                        value="{{if eq .Title "Update Author"}}{{.Author.FirstName}}{{else}}{{end}}"
+                        value="{{if eq .Title "Update Author"}}{{.Author.FirstName}}{{end}}"
                         required />
                 <label for="family_name">Family Name: </label>
                 <input
@@ -18,7 +18,7 @@
                         type="text"
                         placeholder="Enter family name ..."
                         name="family_name"
-                        value="{{if eq .Title "Update Author"}}{{.Author.FamilyName}}{{else}}{{end}}"
+                        value="{{if eq .Title "Update Author"}}{{.Author.FamilyName}}{{end}}"
                         required />
             </div>
             <div class="form-group">
@@ -28,7 +28,7 @@
                         class="form-control"
                         type="date"
                         name="date_of_birth"
-                        value="{{if eq .Title "Update Author"}}{{.Author.DateBirth}}{{else}}{{end}}" />
+                        value="{{if eq .Title "Update Author"}}{{.Author.DateBirth}}{{end}}" />
             </div>
             <div class="form-group">
                 <label for="date_of_death">Date of death: </label>
@@ -37,7 +37,7 @@
                         class="form-control"
                         type="date"
                         name="date_of_death"
-                        value="{{if eq .Title "Update Author"}}{{.Author.DateDeath}}{{else}}{{end}}" />
+                        value="{{if eq .Title "Update Author"}}{{.Author.DateDeath}}{{end}}" />
             </div>
             <button class="btn btn-primary" type="submit">
                 Submit

@@ -1,6 +1,6 @@
 {{define "content"}}
     <h1>{{.Title}}</h1>
-        <form method="post" action="/catalog/book/create">
+        <form method="post" action="{{if eq .Title "Update Book"}}/catalog/book/{{.Book.ID}}/update{{else}}/catalog/book/create{{end}}">
             <div class="form-group">
                 <label for="title">Title: </label>
                 <input
@@ -9,6 +9,7 @@
                         type="text"
                         placeholder="Enter name of book..."
                         name="title"
+                        value="{{if eq .Title "Update Book"}}{{.Book.Name}}{{end}}"
                         required />
             </div>
             <div class="form-group">
@@ -18,20 +19,36 @@
                         class="form-control"
                         name="author"
                         required>
-                    <option selected disabled>Select author</option>
-                    {{range .AuthorList}}
-                        <option value="{{.ID}}">{{.FamilyName}}, {{.FirstName}}</option>
+                    {{if eq .Title "Update Book"}}
+                        <option selected disabled value="{{.Book.Author.ID}}">Primary author: {{.Book.Author.FamilyName}}, {{.Book.Author.FirstName}}</option>
+                        <option selected value="{{.Book.Author.ID}}">{{.Book.Author.FamilyName}}, {{.Book.Author.FirstName}}</option>
+                        {{range .Author}}
+                                <option value="{{.ID}}">{{.FamilyName}}, {{.FirstName}}</option>
+                        {{end}}
+                    {{else}}
+                        <option selected disabled>Select author</option>
+                        {{range .AuthorList}}
+                            <option value="{{.ID}}">{{.FamilyName}}, {{.FirstName}}</option>
+                        {{end}}
                     {{end}}
                 </select>
             </div>
             <div class="form-group">
                 <label for="summary">Summary: </label>
-                <textarea
-                        id="summary"
-                        class="form-control"
-                        placeholder="Enter summary..."
-                        name="summary"
-                        required></textarea>
+                {{if eq .Title "Update Book"}}
+                    <textarea
+                                id="summary"
+                                class="form-control"
+                                name="summary"
+                                required>{{.Book.Summary}}</textarea>
+                {{else}}
+                    <textarea
+                                id="summary"
+                                class="form-control"
+                                placeholder="Enter summary..."
+                                name="summary"
+                                required></textarea>
+                {{end}}
             </div>
             <div class="form-group">
                 <label for="isbn">ISBN: </label>
@@ -41,6 +58,7 @@
                         type="text"
                         placeholder="Enter ISBN..."
                         name="isbn"
+                        value="{{if eq .Title "Update Book"}}{{.Book.Isbn}}{{end}}"
                         required />
             </div>
             <div class="form-group">
@@ -51,9 +69,26 @@
                         name="genre"
                         multiple
                         required>
-                    <option disabled>Select genres</option>
-                    {{range .GenreList}}
-                        <option value="{{.ID}}">{{.Name}}</option>
+                    {{if eq .Title "Update Book"}}
+                        {{if not .Book.Genre}}
+                            <option disabled>Select genres</option>
+                            {{range .Genre}}
+                                <option value="{{.ID}}">{{.Name}}</option>
+                            {{end}}
+                        {{else}}
+                            <option disabled>Primary genre(s):</option>
+                            {{range .Book.Genre}}
+                                <option selected value="{{.ID}}">{{.Name}}</option>
+                            {{end}}
+                            {{range .Genre}}
+                                    <option value="{{.ID}}">{{.Name}}</option>
+                            {{end}}
+                        {{end}}
+                    {{else}}
+                        <option disabled>Select genres</option>
+                        {{range .GenreList}}
+                            <option value="{{.ID}}">{{.Name}}</option>
+                        {{end}}
                     {{end}}
                 </select>
             </div>

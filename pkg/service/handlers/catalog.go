@@ -34,8 +34,8 @@ func Index(w http.ResponseWriter, r *http.Request) {
 			}
 
 			if len(urlParts) == 5 && urlParts[4] == "update" {
-				/*GetBook(w, r, "/book_delete.gohtml")
-				return*/
+				UpdateBook(w, r)
+				return
 			}
 
 			GetBook(w, r, "/book_detail.gohtml")
