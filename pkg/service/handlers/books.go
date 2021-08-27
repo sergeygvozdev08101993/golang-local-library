@@ -337,7 +337,7 @@ func GetUpdateBook(w http.ResponseWriter, r *http.Request) {
 	}
 	if err != nil {
 		renderError(w, http.StatusInternalServerError, "Internal Server Error")
-		app.ErrLog.Printf("failed to get author by ID from database: %v", err)
+		app.ErrLog.Printf("failed to get book by ID from database: %v", err)
 		return
 	}
 

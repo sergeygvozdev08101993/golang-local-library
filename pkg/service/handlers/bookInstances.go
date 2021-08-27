@@ -245,3 +245,171 @@ func DeleteBookInstance(w http.ResponseWriter, r *http.Request) {
 	redirectURL := "/catalog/bookinstances"
 	http.Redirect(w, r, redirectURL, http.StatusSeeOther)
 }
+
+// UpdateBookInstance обрабатывает GET-запрос для отображения формы по обновлению данных экземпляра книги,
+// а также POST-запрос для обновления полученных данных в БД.
+func UpdateBookInstance(w http.ResponseWriter, r *http.Request) {
+
+	switch r.Method {
+	case "GET":
+		GetUpdateBookInstance(w, r)
+		break
+	case "POST":
+		PostUpdateBookInstance(w, r)
+		break
+	}
+}
+
+// GetUpdateBookInstance обрабатывает GET-запрос для отображения формы по обновлению данных экземпляра книги.
+func GetUpdateBookInstance(w http.ResponseWriter, r *http.Request) {
+
+	var (
+		bookInstanceID primitive.ObjectID
+		err            error
+	)
+
+	urlPath := r.URL.Path
+	urlParts := strings.Split(urlPath, "/")
+
+	bookInstanceID, err = primitive.ObjectIDFromHex(urlParts[3])
+	if err != nil {
+		renderError(w, http.StatusInternalServerError, "Internal Server Error")
+		app.ErrLog.Printf("failed to get book instance ID: %v", err)
+		return
+	}
+
+	bookInstance, err := models.GetBookInstanceByID(bookInstanceID)
+	if err != nil && err.Error() == "mongo: no documents in result" {
+		renderError(w, http.StatusNotFound, "Not Found")
+		app.ErrLog.Printf("failed to get book instance by ID from database: %v", err)
+		return
+	}
+	if err != nil {
+		renderError(w, http.StatusInternalServerError, "Internal Server Error")
+		app.ErrLog.Printf("failed to get book instance by ID from database: %v", err)
+		return
+	}
+
+	if len(bookInstance.DueBack) != 0 {
+		dueBackTmp, err := time.Parse("2 Jan, 2006", bookInstance.DueBack)
+		if err != nil {
+			renderError(w, http.StatusInternalServerError, "Internal Server Error")
+			app.ErrLog.Printf("failed to parse the time of due back: %v", err)
+			return
+		}
+		bookInstance.DueBack = dueBackTmp.Format("2006-01-02")
+	}
+
+	bookList, err := models.GetListAllBooks()
+	if err != nil {
+		renderError(w, http.StatusInternalServerError, "Internal Server Error")
+		app.ErrLog.Printf("failed to get book list from database: %v", err)
+		return
+	}
+
+	tmpl, err := template.ParseFiles(templateDirPath+"/index.gohtml", templateDirPath+"/bookinstance_form.gohtml")
+	if err != nil {
+		renderError(w, http.StatusInternalServerError, "Internal Server Error")
+		app.ErrLog.Printf("failed to parse template files: %v", err)
+		return
+	}
+
+	d := models.Detail{
+		Title:        "Update BookInstance",
+		BookInstance: bookInstance,
+		Books:        bookList,
+	}
+
+	if err = tmpl.ExecuteTemplate(w, "index", d); err != nil {
+		renderError(w, http.StatusInternalServerError, "Internal Server Error")
+		app.ErrLog.Printf("failed to render template file: %v", err)
+		return
+	}
+}
+
+// PostUpdateBookInstance обрабатывает POST-запрос из HTML-формы по обновлению данных экземпляра книги,
+// обновляет данные в БД и перенаправляет на страницу экземпляра книги.
+func PostUpdateBookInstance(w http.ResponseWriter, r *http.Request) {
+
+	var (
+		imprint, status, dueBackStr, bookIDStr string
+		bookID                                 primitive.ObjectID
+		dueBackTime                            time.Time
+		dueBack                                interface{}
+		bookInstanceIDStr                      string
+		bookInstanceID                         primitive.ObjectID
+
+		err error
+	)
+
+	urlPath := r.URL.Path
+	urlParts := strings.Split(urlPath, "/")
+	bookInstanceIDStr = urlParts[3]
+
+	bookInstanceID, err = primitive.ObjectIDFromHex(bookInstanceIDStr)
+	if err != nil {
+		renderError(w, http.StatusInternalServerError, "Internal Server Error")
+		app.ErrLog.Printf("failed to get book instance ID: %v", err)
+		return
+	}
+
+	if err = r.ParseForm(); err != nil {
+		renderError(w, http.StatusInternalServerError, "Internal Server Error")
+		app.ErrLog.Printf("failed to parse book instance create form: %v", err)
+		return
+	}
+
+	bookIDStr = r.FormValue("book")
+	imprint = r.FormValue("imprint")
+	status = r.FormValue("status")
+	dueBackStr = r.FormValue("due_back")
+
+	if len(bookIDStr) == 0 {
+		renderError(w, http.StatusBadRequest, "Bad Request")
+		app.ErrLog.Println("failed to get book ID parameter")
+		return
+	}
+
+	bookID, err = primitive.ObjectIDFromHex(bookIDStr)
+	if err != nil {
+		renderError(w, http.StatusInternalServerError, "Internal Server Error")
+		app.ErrLog.Printf("failed to get book ID: %v", err)
+		return
+	}
+
+	tmpImprint := strings.TrimSpace(imprint)
+	if len(tmpImprint) == 0 {
+		renderError(w, http.StatusBadRequest, "Bad Request")
+		app.ErrLog.Println("failed to get the book instance imprint parameter")
+		return
+	}
+
+	if len(dueBackStr) == 0 {
+		dueBack = nil
+	} else {
+		dueBackTime, err = time.Parse("2006-01-02", dueBackStr)
+		if err != nil {
+			renderError(w, http.StatusInternalServerError, "Internal Server Error")
+			app.ErrLog.Printf("failed to parse book instance due back parameter from bookinstance-form: %v", err)
+			return
+		}
+
+		dueBack = primitive.NewDateTimeFromTime(dueBackTime)
+	}
+
+	if len(status) == 0 {
+		renderError(w, http.StatusBadRequest, "Bad Request")
+		app.ErrLog.Println("failed to get book instance status parameter")
+		return
+	}
+
+	err = models.UpdateBookInstanceByID(bookInstanceID, status, imprint, dueBack, bookID)
+	if err != nil {
+		renderError(w, http.StatusInternalServerError, "Internal Server Error")
+		app.ErrLog.Printf("failed to update book instance: %v", err)
+		return
+	}
+
+	redirectURL := "/catalog/bookinstance/" + bookInstanceIDStr
+	http.Redirect(w, r, redirectURL, http.StatusSeeOther)
+}

@@ -97,8 +97,8 @@ func Index(w http.ResponseWriter, r *http.Request) {
 			}
 
 			if len(urlParts) == 5 && urlParts[4] == "update" {
-				/*GetBookInstance(w, r, "/bookinstance_delete.gohtml")
-				return*/
+				UpdateBookInstance(w, r)
+				return
 			}
 
 			GetBookInstance(w, r, "/bookinstance_detail.gohtml")

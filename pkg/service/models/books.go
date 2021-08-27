@@ -316,10 +316,10 @@ func UpdateBookByID(bookID primitive.ObjectID, title, summary, isbn string, auth
 	var err error
 
 	libDB := app.ClientDB.Database("local_library")
-	authorsCollection := libDB.Collection("books")
+	booksCollection := libDB.Collection("books")
 
 	ctx := context.TODO()
-	_, err = authorsCollection.UpdateOne(
+	_, err = booksCollection.UpdateOne(
 		ctx,
 		bson.M{"_id": bookID},
 		bson.D{
