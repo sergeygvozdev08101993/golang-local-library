@@ -12,9 +12,15 @@
             <strong>ISBN: </strong>{{.Book.Isbn}}
         </p>
         <p>
-            <strong>Genre: </strong>
+            <strong>Genre(s): </strong>
+            {{$flag := true}}
             {{range .Book.Genre}}
-                <a href="/catalog/genre/{{.ID}}">{{.Name}}</a>
+                {{if $flag}}
+                    {{$flag = false}}
+                {{else}}
+                    ,
+                {{end}}
+                <a href="/catalog/genre/{{.ID}}"> {{.Name}}</a>
             {{end}}
         </p>
 
