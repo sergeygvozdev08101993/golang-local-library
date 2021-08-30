@@ -9,8 +9,6 @@ import (
 	"github.com/sergeygvozdev08101993/golang-local-library/pkg/service/models"
 )
 
-var templateDirPath = ".././pkg/web/templates"
-
 // Index выполняет обязанности пользовательского роутера.
 func Index(w http.ResponseWriter, r *http.Request) {
 
@@ -22,90 +20,55 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	} else {
 		if urlParts[2] == "book" && len(urlParts[3]) == 24 {
 
-			if len(urlParts) == 5 && urlParts[4] == "delete" {
-
-				if r.Method == "GET" {
-					GetBook(w, r, "/book_delete.gohtml")
-					return
-				} else if r.Method == "POST" {
-					DeleteBook(w, r)
-					return
-				}
-			}
-
-			if len(urlParts) == 5 && urlParts[4] == "update" {
-				UpdateBook(w, r)
-				return
-			}
-
-			GetBook(w, r, "/book_detail.gohtml")
+			customRouting(w, r, urlParts, GetBook, DeleteBook, UpdateBook,
+				"/book_delete.gohtml", "/book_detail.gohtml")
 			return
 
 		} else if urlParts[2] == "author" && len(urlParts[3]) == 24 {
 
-			if len(urlParts) == 5 && urlParts[4] == "delete" {
-
-				if r.Method == "GET" {
-					GetAuthor(w, r, "/author_delete.gohtml")
-					return
-				} else if r.Method == "POST" {
-					DeleteAuthor(w, r)
-					return
-				}
-			}
-
-			if len(urlParts) == 5 && urlParts[4] == "update" {
-				UpdateAuthor(w, r)
-				return
-			}
-
-			GetAuthor(w, r, "/author_detail.gohtml")
+			customRouting(w, r, urlParts, GetAuthor, DeleteAuthor, UpdateAuthor,
+				"/author_delete.gohtml", "/author_detail.gohtml")
 			return
 
 		} else if urlParts[2] == "genre" && len(urlParts[3]) == 24 {
 
-			if len(urlParts) == 5 && urlParts[4] == "delete" {
-
-				if r.Method == "GET" {
-					GetGenre(w, r, "/genre_delete.gohtml")
-					return
-				} else if r.Method == "POST" {
-					DeleteGenre(w, r)
-					return
-				}
-			}
-
-			if len(urlParts) == 5 && urlParts[4] == "update" {
-				UpdateGenre(w, r)
-				return
-			}
-
-			GetGenre(w, r, "/genre_detail.gohtml")
+			customRouting(w, r, urlParts, GetGenre, DeleteGenre, UpdateGenre,
+				"/genre_delete.gohtml", "/genre_detail.gohtml")
 			return
 
 		} else if urlParts[2] == "bookinstance" && len(urlParts[3]) == 24 {
 
-			if len(urlParts) == 5 && urlParts[4] == "delete" {
-
-				if r.Method == "GET" {
-					GetBookInstance(w, r, "/bookinstance_delete.gohtml")
-					return
-				} else if r.Method == "POST" {
-					DeleteBookInstance(w, r)
-					return
-				}
-			}
-
-			if len(urlParts) == 5 && urlParts[4] == "update" {
-				UpdateBookInstance(w, r)
-				return
-			}
-
-			GetBookInstance(w, r, "/bookinstance_detail.gohtml")
+			customRouting(w, r, urlParts, GetBookInstance, DeleteBookInstance, UpdateBookInstance,
+				"/bookinstance_delete.gohtml", "/bookinstance_detail.gohtml")
 			return
-
 		}
 	}
+}
+
+// customRouting содержит реализацию роутинга для конкретного объекта данных.
+func customRouting(w http.ResponseWriter, r *http.Request, urlParts []string,
+	get models.GetHandler, delete models.DeleteHandler, update models.UpdateHandler,
+	deleteTemplate string, detailTemplate string) {
+
+	if len(urlParts) == 5 && urlParts[4] == "delete" {
+
+		if r.Method == "GET" {
+			get(w, r, deleteTemplate)
+			return
+		} else if r.Method == "POST" {
+			delete(w, r)
+			return
+		}
+	}
+
+	if len(urlParts) == 5 && urlParts[4] == "update" {
+		update(w, r)
+		return
+	}
+
+	get(w, r, detailTemplate)
+	return
+
 }
 
 // Catalog обрабатывает запрос для отображения информации о количестве документов, содержащих в каждой коллекции.
@@ -120,7 +83,7 @@ func Catalog(w http.ResponseWriter, r *http.Request) {
 
 	r.ParseForm()
 
-	tmpl, err := template.ParseFiles(templateDirPath+"/index.gohtml", templateDirPath+"/main.gohtml")
+	tmpl, err := template.ParseFiles(models.TemplateDirPath+"/index.gohtml", models.TemplateDirPath+"/main.gohtml")
 	if err != nil {
 		renderError(w, http.StatusInternalServerError, "Internal Server Error")
 		app.ErrLog.Printf("failed to parse template files: %v", err)
@@ -180,5 +143,25 @@ func renderTemplate(w http.ResponseWriter, tmpl *template.Template, result []mod
 
 	if err := tmpl.ExecuteTemplate(w, "index", d); err != nil {
 		app.ErrLog.Printf("failed to render template file: %v", err)
+	}
+}
+
+// renderError предназначена для отображения статуса и сообщения об ошибке.
+func renderError(w http.ResponseWriter, code int64, body string) {
+
+	d := models.Err{
+		Status:  code,
+		Message: body,
+	}
+
+	tmpl, err := template.ParseFiles(models.TemplateDirPath + "/error.gohtml")
+	if err != nil {
+		app.ErrLog.Println(err)
+		return
+	}
+
+	if err := tmpl.ExecuteTemplate(w, "error", d); err != nil {
+		app.ErrLog.Println(err)
+		return
 	}
 }

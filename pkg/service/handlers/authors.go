@@ -48,7 +48,7 @@ func GetAuthor(w http.ResponseWriter, r *http.Request, contentTemplate string) {
 		return
 	}
 
-	tmpl, err := template.ParseFiles(templateDirPath+"/index.gohtml", templateDirPath+contentTemplate)
+	tmpl, err := template.ParseFiles(models.TemplateDirPath+"/index.gohtml", models.TemplateDirPath+contentTemplate)
 	if err != nil {
 		renderError(w, http.StatusInternalServerError, "Internal Server Error")
 		app.ErrLog.Printf("failed to parse template files: %v", err)
@@ -90,7 +90,7 @@ func GetAuthor(w http.ResponseWriter, r *http.Request, contentTemplate string) {
 // ListAuthors обрабатывает запрос для отображения всех авторов, содержащихся в коллекции.
 func ListAuthors(w http.ResponseWriter, r *http.Request) {
 
-	tmpl, err := template.ParseFiles(templateDirPath+"/index.gohtml", templateDirPath+"/author_list.gohtml")
+	tmpl, err := template.ParseFiles(models.TemplateDirPath+"/index.gohtml", models.TemplateDirPath+"/author_list.gohtml")
 	if err != nil {
 		renderError(w, http.StatusInternalServerError, "Internal Server Error")
 		app.ErrLog.Printf("failed to parse template files: %v", err)
@@ -133,7 +133,7 @@ func CreateAuthor(w http.ResponseWriter, r *http.Request) {
 // GetCreateAuthor обрабатывает GET-запрос для отображения формы по созданию нового автора.
 func GetCreateAuthor(w http.ResponseWriter) {
 
-	tmpl, err := template.ParseFiles(templateDirPath+"/index.gohtml", templateDirPath+"/author_form.gohtml")
+	tmpl, err := template.ParseFiles(models.TemplateDirPath+"/index.gohtml", models.TemplateDirPath+"/author_form.gohtml")
 	if err != nil {
 		renderError(w, http.StatusInternalServerError, "Internal Server Error")
 		app.ErrLog.Printf("failed to parse template files: %v", err)
@@ -306,7 +306,7 @@ func GetUpdateAuthor(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl, err := template.ParseFiles(templateDirPath+"/index.gohtml", templateDirPath+"/author_form.gohtml")
+	tmpl, err := template.ParseFiles(models.TemplateDirPath+"/index.gohtml", models.TemplateDirPath+"/author_form.gohtml")
 	if err != nil {
 		renderError(w, http.StatusInternalServerError, "Internal Server Error")
 		app.ErrLog.Printf("failed to parse template files: %v", err)
