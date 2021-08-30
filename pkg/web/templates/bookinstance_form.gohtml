@@ -1,6 +1,6 @@
 {{define "content"}}
     <h1>{{.Title}}</h1>
-        <form method="post" action="{{if eq .Title "Update BookInstance"}}/catalog/bookinstance/{{.BookInstance.ID}}/create{{else}}/catalog/bookinstance/create{{end}}">
+        <form method="post" action="{{if eq .Title "Update BookInstance"}}/catalog/bookinstance/{{.BookInstance.ID}}/update{{else}}/catalog/bookinstance/create{{end}}">
             <div class="form-group">
                 <label for="book">Book: </label>
                 <select
@@ -51,7 +51,7 @@
                         required>
                     {{if eq .Title "Update BookInstance"}}
                         <option disabled>Select a status</option>
-                        {{if eq .BookInstance.Status "Maintenace"}}
+                        {{if eq .BookInstance.Status "Maintenance"}}
                             <option selected value="Maintenance">Maintenance</option>
                         {{else}}
                             <option value="Maintenance">Maintenance</option>
