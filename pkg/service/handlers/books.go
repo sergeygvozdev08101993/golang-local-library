@@ -47,7 +47,7 @@ func GetBook(w http.ResponseWriter, r *http.Request, contentTemplate string) {
 		return
 	}
 
-	tmpl, err := template.ParseFiles(templateDirPath+"/index.gohtml", templateDirPath+contentTemplate)
+	tmpl, err := template.ParseFiles(models.TemplateDirPath+"/index.gohtml", models.TemplateDirPath+contentTemplate)
 	if err != nil {
 		renderError(w, http.StatusInternalServerError, "Internal Server Error")
 		app.ErrLog.Printf("failed to parse template files: %v", err)
@@ -69,7 +69,7 @@ func GetBook(w http.ResponseWriter, r *http.Request, contentTemplate string) {
 // ListBooks обрабатывает запрос для отображения всех книг, содержащихся в коллекции.
 func ListBooks(w http.ResponseWriter, r *http.Request) {
 
-	tmpl, err := template.ParseFiles(templateDirPath+"/index.gohtml", templateDirPath+"/book_list.gohtml")
+	tmpl, err := template.ParseFiles(models.TemplateDirPath+"/index.gohtml", models.TemplateDirPath+"/book_list.gohtml")
 	if err != nil {
 		renderError(w, http.StatusInternalServerError, "Internal Server Error")
 		app.ErrLog.Printf("failed to parse template files: %v", err)
@@ -131,7 +131,7 @@ func GetCreateBook(w http.ResponseWriter) {
 		return
 	}
 
-	tmpl, err := template.ParseFiles(templateDirPath+"/index.gohtml", templateDirPath+"/book_form.gohtml")
+	tmpl, err := template.ParseFiles(models.TemplateDirPath+"/index.gohtml", models.TemplateDirPath+"/book_form.gohtml")
 	if err != nil {
 		renderError(w, http.StatusInternalServerError, "Internal Server Error")
 		app.ErrLog.Printf("failed to parse template files: %v", err)
@@ -241,26 +241,6 @@ func PostCreateBook(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, redirectURL, http.StatusSeeOther)
 }
 
-// renderError предназначена для отображения статуса и сообщения об ошибке.
-func renderError(w http.ResponseWriter, code int64, body string) {
-
-	d := models.Err{
-		Status:  code,
-		Message: body,
-	}
-
-	tmpl, err := template.ParseFiles(templateDirPath + "/error.gohtml")
-	if err != nil {
-		app.ErrLog.Println(err)
-		return
-	}
-
-	if err := tmpl.ExecuteTemplate(w, "error", d); err != nil {
-		app.ErrLog.Println(err)
-		return
-	}
-}
-
 // DeleteBook обрабатывает POST-запрос из HTML-формы по удалению данных книги,
 // удаляет данные книги из БД и перенаправляет на страницу, содержащую список книг.
 func DeleteBook(w http.ResponseWriter, r *http.Request) {
@@ -355,7 +335,7 @@ func GetUpdateBook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl, err := template.ParseFiles(templateDirPath+"/index.gohtml", templateDirPath+"/book_form.gohtml")
+	tmpl, err := template.ParseFiles(models.TemplateDirPath+"/index.gohtml", models.TemplateDirPath+"/book_form.gohtml")
 	if err != nil {
 		renderError(w, http.StatusInternalServerError, "Internal Server Error")
 		app.ErrLog.Printf("failed to parse template files: %v", err)

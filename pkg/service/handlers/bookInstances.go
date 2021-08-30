@@ -41,7 +41,7 @@ func GetBookInstance(w http.ResponseWriter, r *http.Request, contentTemplate str
 		return
 	}
 
-	tmpl, err := template.ParseFiles(templateDirPath+"/index.gohtml", templateDirPath+contentTemplate)
+	tmpl, err := template.ParseFiles(models.TemplateDirPath+"/index.gohtml", models.TemplateDirPath+contentTemplate)
 	if err != nil {
 		renderError(w, http.StatusInternalServerError, "Internal Server Error")
 		app.ErrLog.Printf("failed to parse template files: %v", err)
@@ -62,7 +62,7 @@ func GetBookInstance(w http.ResponseWriter, r *http.Request, contentTemplate str
 // ListBookInstances обрабатывает запрос для отображения всех экземпляров книг, содержащихся в коллекции.
 func ListBookInstances(w http.ResponseWriter, r *http.Request) {
 
-	tmpl, err := template.ParseFiles(templateDirPath+"/index.gohtml", templateDirPath+"/bookinstance_list.gohtml")
+	tmpl, err := template.ParseFiles(models.TemplateDirPath+"/index.gohtml", models.TemplateDirPath+"/bookinstance_list.gohtml")
 	if err != nil {
 		renderError(w, http.StatusInternalServerError, "Internal Server Error")
 		app.ErrLog.Printf("failed to parse template files: %v", err)
@@ -117,7 +117,7 @@ func GetCreateBookInstance(w http.ResponseWriter) {
 		return
 	}
 
-	tmpl, err := template.ParseFiles(templateDirPath+"/index.gohtml", templateDirPath+"/bookinstance_form.gohtml")
+	tmpl, err := template.ParseFiles(models.TemplateDirPath+"/index.gohtml", models.TemplateDirPath+"/bookinstance_form.gohtml")
 	if err != nil {
 		renderError(w, http.StatusInternalServerError, "Internal Server Error")
 		app.ErrLog.Printf("failed to parse template files: %v", err)
@@ -307,7 +307,7 @@ func GetUpdateBookInstance(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl, err := template.ParseFiles(templateDirPath+"/index.gohtml", templateDirPath+"/bookinstance_form.gohtml")
+	tmpl, err := template.ParseFiles(models.TemplateDirPath+"/index.gohtml", models.TemplateDirPath+"/bookinstance_form.gohtml")
 	if err != nil {
 		renderError(w, http.StatusInternalServerError, "Internal Server Error")
 		app.ErrLog.Printf("failed to parse template files: %v", err)

@@ -1,5 +1,19 @@
 package models
 
+import "net/http"
+
+// TemplateDirPath содержит путь к директории, где хранятся шаблоны.
+const TemplateDirPath = ".././pkg/web/templates"
+
+// GetHandler описывает тип обработчика, предоставляющего пользователю данные.
+type GetHandler func(http.ResponseWriter, *http.Request, string)
+
+// DeleteHandler описывает тип обработчика, удаляющего данные из БД.
+type DeleteHandler func(http.ResponseWriter, *http.Request)
+
+// UpdateHandler описывает тип обработчика, обновляющего данные в БД.
+type UpdateHandler func(http.ResponseWriter, *http.Request)
+
 // Data описывает структуру данных, предназначенную для
 // вывода списка всех документов и их общего числа в каждой коллекции.
 type Data struct {
